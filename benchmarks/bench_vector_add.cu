@@ -3,6 +3,7 @@
 
 #include <cuda_runtime.h>
 
+#include <algorithm>
 #include <iostream>
 #include <stdexcept>
 #include <string>
@@ -33,9 +34,9 @@ void run_case(std::size_t n, int iterations) {
     GPU_LAB_CUDA_CHECK(cudaMemcpy(b, host.data(), bytes, cudaMemcpyHostToDevice));
     gpu_lab::cuda::launch_vector_add(a, b, c, n);
     GPU_LAB_CUDA_CHECK(cudaDeviceSynchronize());
-    float first = 0.0f;
-    GPU_LAB_CUDA_CHECK(cudaMemcpy(&first, c, sizeof(float), cudaMemcpyDeviceToHost));
-    if (first != 2.0f) {
+    std::vector<float> actual(n);
+    GPU_LAB_CUDA_CHECK(cudaMemcpy(actual.data(), c, bytes, cudaMemcpyDeviceToHost));
+    if (std::any_of(actual.begin(), actual.end(), [](float value) { return value != 2.0f; })) {
         GPU_LAB_CUDA_CHECK(cudaFree(a));
         GPU_LAB_CUDA_CHECK(cudaFree(b));
         GPU_LAB_CUDA_CHECK(cudaFree(c));

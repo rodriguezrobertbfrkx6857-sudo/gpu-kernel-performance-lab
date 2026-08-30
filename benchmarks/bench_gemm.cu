@@ -4,6 +4,7 @@
 #include <cublas_v2.h>
 #include <cuda_runtime.h>
 
+#include <cmath>
 #include <cstddef>
 #include <iostream>
 #include <stdexcept>
@@ -22,8 +23,20 @@ void check_cublas(cublasStatus_t status, const char* expression) {
 
 template <typename Launch>
 void run_variant(const char* variant, const char* baseline_variant, Launch&& launch, int side,
-                 int iterations) {
+                 int iterations, float* output, const std::vector<float>& expected) {
     constexpr int warmup = 20;
+    launch();
+    GPU_LAB_CUDA_CHECK(cudaDeviceSynchronize());
+    std::vector<float> actual(expected.size());
+    GPU_LAB_CUDA_CHECK(cudaMemcpy(actual.data(), output, actual.size() * sizeof(float),
+                                  cudaMemcpyDeviceToHost));
+    for (std::size_t index = 0; index < actual.size(); ++index) {
+        const float error = std::fabs(actual[index] - expected[index]);
+        const float tolerance = 1.0e-3f + 1.0e-3f * std::fabs(expected[index]);
+        if (error > tolerance) {
+            throw std::runtime_error(std::string("GEMM correctness failed for ") + variant);
+        }
+    }
     const auto summary = gpu_lab::bench::measure_cuda(std::forward<Launch>(launch), warmup,
                                                       iterations);
     const std::size_t elements = static_cast<std::size_t>(side) * side;
@@ -55,6 +68,7 @@ void run_case(int side, int iterations, const std::string& profile_case) {
 
     std::vector<float> host_a(matrix_elements, 1.0f);
     std::vector<float> host_b(matrix_elements, 1.0f);
+    std::vector<float> expected(matrix_elements, static_cast<float>(side));
     float* a = nullptr;
     float* b = nullptr;
     float* c = nullptr;
@@ -78,12 +92,12 @@ void run_case(int side, int iterations, const std::string& profile_case) {
     if (case_matches(profile_case, "gemm_naive", side)) {
         run_variant("gemm_naive", nullptr, [&] {
             gpu_lab::cuda::launch_gemm_naive(a, b, c, side, side, side);
-        }, side, iterations);
+        }, side, iterations, c, expected);
     }
     if (case_matches(profile_case, "gemm_tiled", side)) {
         run_variant("gemm_tiled", "gemm_naive", [&] {
             gpu_lab::cuda::launch_gemm_tiled(a, b, c, side, side, side);
-        }, side, iterations);
+        }, side, iterations, c, expected);
     }
 
     if (case_matches(profile_case, "cublas_sgemm", side)) {
@@ -97,7 +111,7 @@ void run_case(int side, int iterations, const std::string& profile_case) {
             check_cublas(cublasSgemm(handle, CUBLAS_OP_N, CUBLAS_OP_N, side, side, side, &alpha,
                                      b, side, a, side, &beta, c, side),
                          "cublasSgemm");
-        }, side, iterations);
+        }, side, iterations, c, expected);
         check_cublas(cublasDestroy(handle), "cublasDestroy");
     }
 
