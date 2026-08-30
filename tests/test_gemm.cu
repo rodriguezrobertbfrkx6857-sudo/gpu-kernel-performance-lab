@@ -2,11 +2,25 @@
 #include "kernels.cuh"
 #include "test_utils.hpp"
 
+#include <cublas_v2.h>
 #include <cuda_runtime.h>
 
 #include <cmath>
 #include <cstddef>
+#include <stdexcept>
+#include <string>
 #include <vector>
+
+namespace {
+
+void check_cublas(cublasStatus_t status, const char* expression) {
+    if (status != CUBLAS_STATUS_SUCCESS) {
+        throw std::runtime_error(std::string(expression) + " failed with cuBLAS status " +
+                                 std::to_string(static_cast<int>(status)));
+    }
+}
+
+}  // namespace
 
 int main() {
     constexpr int m = 37;
@@ -49,10 +63,24 @@ int main() {
         gpu_lab::test::require_array_near(actual.data(), expected.data(), expected.size(),
                                           1.0e-3, 1.0e-3, variant.name);
     }
+
+    cublasHandle_t handle = nullptr;
+    check_cublas(cublasCreate(&handle), "cublasCreate");
+    const float alpha = 1.0f;
+    const float beta = 0.0f;
+    // For row-major C = A * B, column-major cuBLAS sees C^T = B^T * A^T.
+    check_cublas(cublasSgemm(handle, CUBLAS_OP_N, CUBLAS_OP_N, n, m, k, &alpha, db, n, da, k,
+                             &beta, dc, n),
+                 "cublasSgemm");
+    GPU_LAB_CUDA_CHECK(cudaDeviceSynchronize());
+    GPU_LAB_CUDA_CHECK(cudaMemcpy(actual.data(), dc, actual.size() * sizeof(float),
+                                  cudaMemcpyDeviceToHost));
+    gpu_lab::test::require_array_near(actual.data(), expected.data(), expected.size(),
+                                      1.0e-3, 1.0e-3, "cublas_sgemm");
+    check_cublas(cublasDestroy(handle), "cublasDestroy");
     gpu_lab::test::pass("gemm variants");
     GPU_LAB_CUDA_CHECK(cudaFree(da));
     GPU_LAB_CUDA_CHECK(cudaFree(db));
     GPU_LAB_CUDA_CHECK(cudaFree(dc));
     return 0;
 }
-

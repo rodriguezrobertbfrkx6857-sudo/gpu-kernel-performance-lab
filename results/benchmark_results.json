@@ -1,5 +1,5 @@
 {
-  "schema_version": 1,
+  "schema_version": 2,
   "generated_by": "scripts/run_all_benchmarks.py",
   "hardware_mode": "cpu_only",
   "protocol": {
@@ -7,344 +7,403 @@
     "cuda_iterations": 100,
     "cpu_warmup": 3,
     "cpu_iterations": 10,
-    "timer": "CUDA Event for CUDA binaries; perf_counter_ns for CPU fallback"
+    "timer": "CUDA Event for CUDA binaries; perf_counter_ns for CPU fallback",
+    "speedup_rule": "declared baseline median divided by candidate median within the same family, shape, and dtype"
   },
   "benchmarks": [
     {
       "family": "vector_add",
-      "kernel": "vector_add_cpu_numpy",
       "variant": "vector_add_cpu_numpy",
       "shape": [
         1048576
       ],
-      "median_ms": 1.6317,
-      "mean_ms": 1.55706,
-      "min_ms": 1.0632,
-      "std_ms": 0.3601953392258151,
+      "dtype": "float32",
+      "device": "Intel64 Family 6 Model 170 Stepping 4, GenuineIntel",
+      "backend": "numpy",
+      "warmup": 3,
+      "iterations": 10,
+      "median_ms": 1.87635,
+      "mean_ms": 1.84006,
+      "min_ms": 1.4514,
+      "std_ms": 0.19070414887988152,
+      "effective_bandwidth_gbps": 6.706058038212487,
+      "baseline_variant": null,
       "speedup": null,
-      "effective_bandwidth_gbps": 7.7115352086780655,
       "status": "BENCHMARKED_CPU_ONLY",
-      "notes": "CPU reference path"
+      "notes": "CPU reference path; CUDA results require a CUDA-capable NVIDIA host"
     },
     {
       "family": "vector_add",
-      "kernel": "vector_add_cpu_numpy",
       "variant": "vector_add_cpu_numpy",
       "shape": [
-        4194304
+        16777216
       ],
-      "median_ms": 7.37595,
-      "mean_ms": 7.15339,
-      "min_ms": 5.6001,
-      "std_ms": 0.7995711681270155,
+      "dtype": "float32",
+      "device": "Intel64 Family 6 Model 170 Stepping 4, GenuineIntel",
+      "backend": "numpy",
+      "warmup": 3,
+      "iterations": 10,
+      "median_ms": 27.3797,
+      "mean_ms": 25.783509999999996,
+      "min_ms": 18.9956,
+      "std_ms": 3.971899515710336,
+      "effective_bandwidth_gbps": 7.353133598980266,
+      "baseline_variant": null,
       "speedup": null,
-      "effective_bandwidth_gbps": 6.823751245602262,
       "status": "BENCHMARKED_CPU_ONLY",
-      "notes": "CPU reference path"
+      "notes": "CPU reference path; CUDA results require a CUDA-capable NVIDIA host"
     },
     {
       "family": "transpose",
-      "kernel": "copy_baseline",
-      "variant": "copy_baseline",
-      "shape": [
-        512,
-        512
-      ],
-      "median_ms": 0.35775,
-      "mean_ms": 0.36227,
-      "min_ms": 0.3338,
-      "std_ms": 0.01555069451825223,
-      "speedup": null,
-      "effective_bandwidth_gbps": 5.862060097833683,
-      "status": "BENCHMARKED_CPU_ONLY",
-      "notes": "CPU analogue of the CUDA copy/coalescing variants"
-    },
-    {
-      "family": "transpose",
-      "kernel": "transpose_naive",
-      "variant": "transpose_naive",
-      "shape": [
-        512,
-        512
-      ],
-      "median_ms": 0.42464999999999997,
-      "mean_ms": 0.42333999999999994,
-      "min_ms": 0.4089,
-      "std_ms": 0.00860013953375177,
-      "speedup": 0.8424584952313671,
-      "effective_bandwidth_gbps": 4.938542328976804,
-      "status": "BENCHMARKED_CPU_ONLY",
-      "notes": "CPU analogue of the CUDA copy/coalescing variants"
-    },
-    {
-      "family": "transpose",
-      "kernel": "transpose_tiled",
-      "variant": "transpose_tiled",
-      "shape": [
-        512,
-        512
-      ],
-      "median_ms": 0.83935,
-      "mean_ms": 0.8416499999999999,
-      "min_ms": 0.7729,
-      "std_ms": 0.032662524397235444,
-      "speedup": 0.426222672305951,
-      "effective_bandwidth_gbps": 2.498542920116757,
-      "status": "BENCHMARKED_CPU_ONLY",
-      "notes": "CPU analogue of the CUDA copy/coalescing variants"
-    },
-    {
-      "family": "transpose",
-      "kernel": "transpose_tiled_padded",
-      "variant": "transpose_tiled_padded",
-      "shape": [
-        512,
-        512
-      ],
-      "median_ms": 0.95305,
-      "mean_ms": 1.1019800000000002,
-      "min_ms": 0.8897,
-      "std_ms": 0.2944415317172494,
-      "speedup": 0.37537379990556635,
-      "effective_bandwidth_gbps": 2.2004637741986253,
-      "status": "BENCHMARKED_CPU_ONLY",
-      "notes": "CPU analogue of the CUDA copy/coalescing variants"
-    },
-    {
-      "family": "transpose",
-      "kernel": "copy_baseline",
       "variant": "copy_baseline",
       "shape": [
         1024,
         1024
       ],
-      "median_ms": 1.2278,
-      "mean_ms": 1.39803,
-      "min_ms": 1.1196,
-      "std_ms": 0.2867127763110671,
+      "dtype": "float32",
+      "device": "Intel64 Family 6 Model 170 Stepping 4, GenuineIntel",
+      "backend": "numpy",
+      "warmup": 3,
+      "iterations": 10,
+      "median_ms": 1.5234,
+      "mean_ms": 1.58699,
+      "min_ms": 1.0956,
+      "std_ms": 0.24418736433321037,
+      "effective_bandwidth_gbps": 5.506503872915846,
+      "baseline_variant": null,
       "speedup": null,
-      "effective_bandwidth_gbps": 6.832226747027203,
       "status": "BENCHMARKED_CPU_ONLY",
-      "notes": "CPU analogue of the CUDA copy/coalescing variants"
+      "notes": "CPU analogue only; copy is a bandwidth reference and transpose speedups are relative to transpose_naive"
     },
     {
       "family": "transpose",
-      "kernel": "transpose_naive",
       "variant": "transpose_naive",
       "shape": [
         1024,
         1024
       ],
-      "median_ms": 5.9349,
-      "mean_ms": 6.644410000000001,
-      "min_ms": 5.5564,
-      "std_ms": 1.7037567041394144,
-      "speedup": 0.20687795919055083,
-      "effective_bandwidth_gbps": 1.4134371261520835,
+      "dtype": "float32",
+      "device": "Intel64 Family 6 Model 170 Stepping 4, GenuineIntel",
+      "backend": "numpy",
+      "warmup": 3,
+      "iterations": 10,
+      "median_ms": 4.02275,
+      "mean_ms": 4.26443,
+      "min_ms": 3.7617,
+      "std_ms": 0.5051228208069796,
+      "effective_bandwidth_gbps": 2.0852919023056367,
+      "baseline_variant": null,
+      "speedup": null,
       "status": "BENCHMARKED_CPU_ONLY",
-      "notes": "CPU analogue of the CUDA copy/coalescing variants"
+      "notes": "CPU analogue only; copy is a bandwidth reference and transpose speedups are relative to transpose_naive"
     },
     {
       "family": "transpose",
-      "kernel": "transpose_tiled",
       "variant": "transpose_tiled",
       "shape": [
         1024,
         1024
       ],
-      "median_ms": 4.8306000000000004,
-      "mean_ms": 4.66821,
-      "min_ms": 3.322,
-      "std_ms": 0.6377308059832142,
-      "speedup": 0.25417132447315033,
-      "effective_bandwidth_gbps": 1.7365561213927876,
+      "dtype": "float32",
+      "device": "Intel64 Family 6 Model 170 Stepping 4, GenuineIntel",
+      "backend": "numpy",
+      "warmup": 3,
+      "iterations": 10,
+      "median_ms": 3.4711,
+      "mean_ms": 3.529090000000001,
+      "min_ms": 2.203,
+      "std_ms": 0.7949876772000934,
+      "effective_bandwidth_gbps": 2.41670018149866,
+      "baseline_variant": "transpose_naive",
+      "speedup": 1.1589265650658294,
       "status": "BENCHMARKED_CPU_ONLY",
-      "notes": "CPU analogue of the CUDA copy/coalescing variants"
+      "notes": "CPU analogue only; copy is a bandwidth reference and transpose speedups are relative to transpose_naive"
     },
     {
       "family": "transpose",
-      "kernel": "transpose_tiled_padded",
       "variant": "transpose_tiled_padded",
       "shape": [
         1024,
         1024
       ],
-      "median_ms": 6.8808,
-      "mean_ms": 7.1267,
-      "min_ms": 5.726,
-      "std_ms": 1.251507471811495,
-      "speedup": 0.17843855365655156,
-      "effective_bandwidth_gbps": 1.2191326589931404,
+      "dtype": "float32",
+      "device": "Intel64 Family 6 Model 170 Stepping 4, GenuineIntel",
+      "backend": "numpy",
+      "warmup": 3,
+      "iterations": 10,
+      "median_ms": 8.6517,
+      "mean_ms": 9.02517,
+      "min_ms": 6.0164,
+      "std_ms": 1.7898372585517375,
+      "effective_bandwidth_gbps": 0.969590716275414,
+      "baseline_variant": "transpose_naive",
+      "speedup": 0.46496642278396155,
       "status": "BENCHMARKED_CPU_ONLY",
-      "notes": "CPU analogue of the CUDA copy/coalescing variants"
+      "notes": "CPU analogue only; copy is a bandwidth reference and transpose speedups are relative to transpose_naive"
+    },
+    {
+      "family": "transpose",
+      "variant": "copy_baseline",
+      "shape": [
+        2048,
+        2048
+      ],
+      "dtype": "float32",
+      "device": "Intel64 Family 6 Model 170 Stepping 4, GenuineIntel",
+      "backend": "numpy",
+      "warmup": 3,
+      "iterations": 10,
+      "median_ms": 5.08305,
+      "mean_ms": 5.05884,
+      "min_ms": 3.9844,
+      "std_ms": 0.911196823084892,
+      "effective_bandwidth_gbps": 6.601239806808904,
+      "baseline_variant": null,
+      "speedup": null,
+      "status": "BENCHMARKED_CPU_ONLY",
+      "notes": "CPU analogue only; copy is a bandwidth reference and transpose speedups are relative to transpose_naive"
+    },
+    {
+      "family": "transpose",
+      "variant": "transpose_naive",
+      "shape": [
+        2048,
+        2048
+      ],
+      "dtype": "float32",
+      "device": "Intel64 Family 6 Model 170 Stepping 4, GenuineIntel",
+      "backend": "numpy",
+      "warmup": 3,
+      "iterations": 10,
+      "median_ms": 56.0852,
+      "mean_ms": 60.16298999999999,
+      "min_ms": 50.3819,
+      "std_ms": 9.343443133390387,
+      "effective_bandwidth_gbps": 0.5982760514360295,
+      "baseline_variant": null,
+      "speedup": null,
+      "status": "BENCHMARKED_CPU_ONLY",
+      "notes": "CPU analogue only; copy is a bandwidth reference and transpose speedups are relative to transpose_naive"
+    },
+    {
+      "family": "transpose",
+      "variant": "transpose_tiled",
+      "shape": [
+        2048,
+        2048
+      ],
+      "dtype": "float32",
+      "device": "Intel64 Family 6 Model 170 Stepping 4, GenuineIntel",
+      "backend": "numpy",
+      "warmup": 3,
+      "iterations": 10,
+      "median_ms": 21.7816,
+      "mean_ms": 21.72533,
+      "min_ms": 13.7548,
+      "std_ms": 4.610959240559388,
+      "effective_bandwidth_gbps": 1.5404943622139788,
+      "baseline_variant": "transpose_naive",
+      "speedup": 2.5748888970507218,
+      "status": "BENCHMARKED_CPU_ONLY",
+      "notes": "CPU analogue only; copy is a bandwidth reference and transpose speedups are relative to transpose_naive"
+    },
+    {
+      "family": "transpose",
+      "variant": "transpose_tiled_padded",
+      "shape": [
+        2048,
+        2048
+      ],
+      "dtype": "float32",
+      "device": "Intel64 Family 6 Model 170 Stepping 4, GenuineIntel",
+      "backend": "numpy",
+      "warmup": 3,
+      "iterations": 10,
+      "median_ms": 39.9785,
+      "mean_ms": 41.23472,
+      "min_ms": 29.4182,
+      "std_ms": 8.92086645240248,
+      "effective_bandwidth_gbps": 0.8393119301624623,
+      "baseline_variant": "transpose_naive",
+      "speedup": 1.4028840501769702,
+      "status": "BENCHMARKED_CPU_ONLY",
+      "notes": "CPU analogue only; copy is a bandwidth reference and transpose speedups are relative to transpose_naive"
     },
     {
       "family": "reduction",
-      "kernel": "reduction_numpy_pairwise",
       "variant": "reduction_numpy_pairwise",
       "shape": [
         1048576
       ],
-      "median_ms": 0.84095,
-      "mean_ms": 0.86068,
-      "min_ms": 0.8268,
-      "std_ms": 0.04416400797029186,
+      "dtype": "float32",
+      "device": "Intel64 Family 6 Model 170 Stepping 4, GenuineIntel",
+      "backend": "numpy",
+      "warmup": 3,
+      "iterations": 10,
+      "median_ms": 0.7162,
+      "mean_ms": 0.73303,
+      "min_ms": 0.4746,
+      "std_ms": 0.24915349907235895,
+      "effective_bandwidth_gbps": 5.856330633901145,
+      "baseline_variant": null,
       "speedup": null,
-      "effective_bandwidth_gbps": 4.987578334026994,
       "status": "BENCHMARKED_CPU_ONLY",
-      "notes": "CPU reference; CUDA shared-memory and warp-shuffle sources are in kernels/"
+      "notes": "CPU reference only; CUDA shared-memory and warp-shuffle sources are in kernels/"
     },
     {
       "family": "reduction",
-      "kernel": "reduction_numpy_sum",
       "variant": "reduction_numpy_sum",
       "shape": [
         1048576
       ],
-      "median_ms": 0.8275999999999999,
-      "mean_ms": 0.73079,
-      "min_ms": 0.4831,
-      "std_ms": 0.14217661164903322,
-      "speedup": 1.0161309811503143,
-      "effective_bandwidth_gbps": 5.068032866118899,
+      "dtype": "float32",
+      "device": "Intel64 Family 6 Model 170 Stepping 4, GenuineIntel",
+      "backend": "numpy",
+      "warmup": 3,
+      "iterations": 10,
+      "median_ms": 0.76985,
+      "mean_ms": 0.75987,
+      "min_ms": 0.4904,
+      "std_ms": 0.10515485770995081,
+      "effective_bandwidth_gbps": 5.448209391439891,
+      "baseline_variant": "reduction_numpy_pairwise",
+      "speedup": 0.9303110995648501,
       "status": "BENCHMARKED_CPU_ONLY",
-      "notes": "CPU reference; CUDA shared-memory and warp-shuffle sources are in kernels/"
+      "notes": "CPU reference only; CUDA shared-memory and warp-shuffle sources are in kernels/"
     },
     {
       "family": "reduction",
-      "kernel": "reduction_numpy_pairwise",
-      "variant": "reduction_numpy_pairwise",
-      "shape": [
-        4194304
-      ],
-      "median_ms": 3.471,
-      "mean_ms": 3.19919,
-      "min_ms": 2.3165,
-      "std_ms": 0.5738574238432399,
-      "speedup": null,
-      "effective_bandwidth_gbps": 4.833539613944108,
-      "status": "BENCHMARKED_CPU_ONLY",
-      "notes": "CPU reference; CUDA shared-memory and warp-shuffle sources are in kernels/"
-    },
-    {
-      "family": "reduction",
-      "kernel": "reduction_numpy_sum",
-      "variant": "reduction_numpy_sum",
-      "shape": [
-        4194304
-      ],
-      "median_ms": 3.532,
-      "mean_ms": 3.67252,
-      "min_ms": 2.3168,
-      "std_ms": 1.1572970697275613,
-      "speedup": 0.9827293318233296,
-      "effective_bandwidth_gbps": 4.7500611551528875,
-      "status": "BENCHMARKED_CPU_ONLY",
-      "notes": "CPU reference; CUDA shared-memory and warp-shuffle sources are in kernels/"
-    },
-    {
-      "family": "reduction",
-      "kernel": "reduction_numpy_pairwise",
       "variant": "reduction_numpy_pairwise",
       "shape": [
         16777216
       ],
-      "median_ms": 15.33545,
-      "mean_ms": 15.903300000000002,
-      "min_ms": 12.131,
-      "std_ms": 2.9497877784681394,
+      "dtype": "float32",
+      "device": "Intel64 Family 6 Model 170 Stepping 4, GenuineIntel",
+      "backend": "numpy",
+      "warmup": 3,
+      "iterations": 10,
+      "median_ms": 18.4195,
+      "mean_ms": 18.55391,
+      "min_ms": 15.0329,
+      "std_ms": 3.2022978857220643,
+      "effective_bandwidth_gbps": 3.6433597003175984,
+      "baseline_variant": null,
       "speedup": null,
-      "effective_bandwidth_gbps": 4.376060956802702,
       "status": "BENCHMARKED_CPU_ONLY",
-      "notes": "CPU reference; CUDA shared-memory and warp-shuffle sources are in kernels/"
+      "notes": "CPU reference only; CUDA shared-memory and warp-shuffle sources are in kernels/"
     },
     {
       "family": "reduction",
-      "kernel": "reduction_numpy_sum",
       "variant": "reduction_numpy_sum",
       "shape": [
         16777216
       ],
-      "median_ms": 16.3532,
-      "mean_ms": 17.794420000000002,
-      "min_ms": 13.7266,
-      "std_ms": 3.8006962322185127,
-      "speedup": 0.937764474231343,
-      "effective_bandwidth_gbps": 4.103714502360394,
+      "dtype": "float32",
+      "device": "Intel64 Family 6 Model 170 Stepping 4, GenuineIntel",
+      "backend": "numpy",
+      "warmup": 3,
+      "iterations": 10,
+      "median_ms": 16.907899999999998,
+      "mean_ms": 16.48537,
+      "min_ms": 11.9087,
+      "std_ms": 3.406998305561656,
+      "effective_bandwidth_gbps": 3.9690833279118056,
+      "baseline_variant": "reduction_numpy_pairwise",
+      "speedup": 1.0894019955168885,
       "status": "BENCHMARKED_CPU_ONLY",
-      "notes": "CPU reference; CUDA shared-memory and warp-shuffle sources are in kernels/"
+      "notes": "CPU reference only; CUDA shared-memory and warp-shuffle sources are in kernels/"
     },
     {
       "family": "gemm",
-      "kernel": "gemm_numpy_blas",
-      "variant": "gemm_numpy_blas",
-      "shape": [
-        128,
-        128,
-        128
-      ],
-      "median_ms": 0.4225,
-      "mean_ms": 0.44469999999999993,
-      "min_ms": 0.3312,
-      "std_ms": 0.07545926053175978,
-      "speedup": null,
-      "effective_bandwidth_gbps": null,
-      "status": "BENCHMARKED_CPU_ONLY",
-      "notes": "CPU reference; CUDA naive/tiled/cuBLAS comparison is in the CUDA build path"
-    },
-    {
-      "family": "gemm",
-      "kernel": "gemm_blocked_cpu",
-      "variant": "gemm_blocked_cpu",
-      "shape": [
-        128,
-        128,
-        128
-      ],
-      "median_ms": 0.2909,
-      "mean_ms": 0.48316,
-      "min_ms": 0.2904,
-      "std_ms": 0.3835214340815908,
-      "speedup": 1.4523891371605362,
-      "effective_bandwidth_gbps": null,
-      "status": "BENCHMARKED_CPU_ONLY",
-      "notes": "CPU reference; CUDA naive/tiled/cuBLAS comparison is in the CUDA build path"
-    },
-    {
-      "family": "gemm",
-      "kernel": "gemm_numpy_blas",
       "variant": "gemm_numpy_blas",
       "shape": [
         256,
         256,
         256
       ],
-      "median_ms": 0.563,
-      "mean_ms": 0.56902,
-      "min_ms": 0.4807,
-      "std_ms": 0.06674103385474338,
-      "speedup": null,
+      "dtype": "float32",
+      "device": "Intel64 Family 6 Model 170 Stepping 4, GenuineIntel",
+      "backend": "numpy",
+      "warmup": 2,
+      "iterations": 5,
+      "median_ms": 0.6958,
+      "mean_ms": 0.70184,
+      "min_ms": 0.5783,
+      "std_ms": 0.09187862863582588,
       "effective_bandwidth_gbps": null,
+      "baseline_variant": null,
+      "speedup": null,
       "status": "BENCHMARKED_CPU_ONLY",
-      "notes": "CPU reference; CUDA naive/tiled/cuBLAS comparison is in the CUDA build path"
+      "notes": "CPU reference only; CUDA naive/tiled/cuBLAS comparison is in the CUDA build path"
     },
     {
       "family": "gemm",
-      "kernel": "gemm_blocked_cpu",
       "variant": "gemm_blocked_cpu",
       "shape": [
         256,
         256,
         256
       ],
-      "median_ms": 8.5707,
-      "mean_ms": 8.65168,
-      "min_ms": 8.3851,
-      "std_ms": 0.2919573146882946,
-      "speedup": 0.06568891689126909,
+      "dtype": "float32",
+      "device": "Intel64 Family 6 Model 170 Stepping 4, GenuineIntel",
+      "backend": "numpy",
+      "warmup": 2,
+      "iterations": 5,
+      "median_ms": 6.6477,
+      "mean_ms": 6.734319999999999,
+      "min_ms": 6.1238,
+      "std_ms": 0.4393712935547792,
       "effective_bandwidth_gbps": null,
+      "baseline_variant": "gemm_numpy_blas",
+      "speedup": 0.10466777983362666,
       "status": "BENCHMARKED_CPU_ONLY",
-      "notes": "CPU reference; CUDA naive/tiled/cuBLAS comparison is in the CUDA build path"
+      "notes": "CPU reference only; CUDA naive/tiled/cuBLAS comparison is in the CUDA build path"
+    },
+    {
+      "family": "gemm",
+      "variant": "gemm_numpy_blas",
+      "shape": [
+        512,
+        512,
+        512
+      ],
+      "dtype": "float32",
+      "device": "Intel64 Family 6 Model 170 Stepping 4, GenuineIntel",
+      "backend": "numpy",
+      "warmup": 2,
+      "iterations": 5,
+      "median_ms": 1.3448,
+      "mean_ms": 1.4541,
+      "min_ms": 1.2354,
+      "std_ms": 0.21020014272116946,
+      "effective_bandwidth_gbps": null,
+      "baseline_variant": null,
+      "speedup": null,
+      "status": "BENCHMARKED_CPU_ONLY",
+      "notes": "CPU reference only; CUDA naive/tiled/cuBLAS comparison is in the CUDA build path"
+    },
+    {
+      "family": "gemm",
+      "variant": "gemm_blocked_cpu",
+      "shape": [
+        512,
+        512,
+        512
+      ],
+      "dtype": "float32",
+      "device": "Intel64 Family 6 Model 170 Stepping 4, GenuineIntel",
+      "backend": "numpy",
+      "warmup": 2,
+      "iterations": 5,
+      "median_ms": 42.4051,
+      "mean_ms": 46.22338,
+      "min_ms": 34.439,
+      "std_ms": 11.290954430055946,
+      "effective_bandwidth_gbps": null,
+      "baseline_variant": "gemm_numpy_blas",
+      "speedup": 0.03171316657666177,
+      "status": "BENCHMARKED_CPU_ONLY",
+      "notes": "CPU reference only; CUDA naive/tiled/cuBLAS comparison is in the CUDA build path"
     }
   ]
 }

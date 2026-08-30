@@ -22,7 +22,7 @@ python scripts/run_all_benchmarks.py
 python scripts/generate_report.py
 ```
 
-The benchmark runner records `median_ms`, `mean_ms`, `min_ms`, `std_ms`, and a baseline-relative speedup where a comparison exists. CUDA binaries use CUDA Events with 20 warm-up launches and 100 measured launches by default. CPU fallback measurements use adaptive counts recorded in the JSON protocol.
+The benchmark runner records `median_ms`, `mean_ms`, `min_ms`, `std_ms`, dtype, device, backend, warm-up count, measured iteration count, and an explicitly declared baseline-relative speedup where a comparison exists. Transpose optimization speedups use `transpose_naive`; `copy_baseline` is reported as a bandwidth reference only. CUDA binaries use CUDA Events with 20 warm-up launches and 100 measured launches by default. CPU fallback measurements use adaptive counts recorded in the JSON protocol.
 
 ## CUDA build
 
@@ -30,14 +30,17 @@ On a CUDA-capable machine with CMake and a C++ compiler:
 
 ```powershell
 cmake -S . -B build -DCMAKE_BUILD_TYPE=Release
-cmake --build build --config Release
+cmake --build build --config Release --parallel
+ctest --test-dir build -C Release --output-on-failure
 ```
 
-The CMake file detects CUDA. With no CUDA compiler it builds `cpu_smoke_tests` only and leaves the `.cu` sources available for inspection or a later CUDA build. On CUDA hardware, run the `test_*` executables before the `bench_*` executables.
+The CMake file detects CUDA. With no CUDA compiler it builds and registers `cpu_smoke_tests` only and leaves the `.cu` sources available for inspection or a later CUDA build. On CUDA hardware, all four CUDA correctness executables are registered with CTest before the benchmark executables. Set `-DGPU_LAB_CUDA_ARCHITECTURES=all` or a specific architecture when the toolchain requires an explicit target; the default leaves the choice to CMake/toolchain configuration.
 
 ## Benchmark methodology
 
-CUDA timing is bracketed by CUDA Events and synchronized at the stop event. Every CUDA test uses non-square or non-multiple-of-32 shapes where useful to exercise bounds checks. Transpose reports effective bandwidth as bytes read plus bytes written divided by median time. GEMM is compared against cuBLAS when the CUDA build links the toolkit library; the project does not assume a custom kernel should beat a vendor library.
+CUDA timing is bracketed by CUDA Events and synchronized at the stop event. Every CUDA test uses non-square or non-multiple-of-32 shapes where useful to exercise bounds checks. Transpose reports effective bandwidth as bytes read plus bytes written divided by median time. GEMM is compared against cuBLAS when the CUDA build links the toolkit library; the project does not assume a custom kernel should beat a vendor library. Large benchmark cases perform a free-memory check and emit a structured skip record when safety headroom is unavailable.
+
+For a focused profiler launch, use the GEMM benchmark selector, for example `build/Release/bench_gemm.exe --profile-case gemm_tiled-512` on a Windows multi-config build. The selector runs one kernel/shape so an Nsight command can be reproduced without profiling unrelated cases.
 
 The generated report for the current machine is [results/results.md](results/results.md), with machine-readable data in [results/benchmark_results.json](results/benchmark_results.json). Because this host has no NVIDIA driver or CUDA Toolkit, CUDA status is `NOT BENCHMARKED ON CURRENT HARDWARE` and the recorded rows are CPU references.
 
@@ -63,4 +66,3 @@ python scripts/generate_report.py
 ```
 
 GPU benchmarks must be reproduced on CUDA-capable hardware. See the generated environment files for the exact state captured for this checkout.
-

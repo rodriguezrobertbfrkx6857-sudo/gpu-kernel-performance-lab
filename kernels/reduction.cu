@@ -65,6 +65,7 @@ namespace gpu_lab::cuda {
 void launch_reduction_naive(const float* input, float* output, std::size_t n,
                             gpu_lab_stream_t stream) {
     GPU_LAB_CUDA_CHECK(cudaMemsetAsync(output, 0, sizeof(float), stream));
+    if (n == 0) return;
     reduction_naive_kernel<<<static_cast<unsigned int>((n + kBlockSize - 1) / kBlockSize),
                              kBlockSize, 0, stream>>>(input, output, n);
     GPU_LAB_CUDA_CHECK(cudaGetLastError());
@@ -73,6 +74,7 @@ void launch_reduction_naive(const float* input, float* output, std::size_t n,
 void launch_reduction_shared(const float* input, float* output, std::size_t n,
                              gpu_lab_stream_t stream) {
     GPU_LAB_CUDA_CHECK(cudaMemsetAsync(output, 0, sizeof(float), stream));
+    if (n == 0) return;
     reduction_shared_kernel<<<reduction_grid(n), kBlockSize, 0, stream>>>(input, output, n);
     GPU_LAB_CUDA_CHECK(cudaGetLastError());
 }
@@ -80,9 +82,9 @@ void launch_reduction_shared(const float* input, float* output, std::size_t n,
 void launch_reduction_warp_shuffle(const float* input, float* output, std::size_t n,
                                    gpu_lab_stream_t stream) {
     GPU_LAB_CUDA_CHECK(cudaMemsetAsync(output, 0, sizeof(float), stream));
+    if (n == 0) return;
     reduction_warp_shuffle_kernel<<<reduction_grid(n), kBlockSize, 0, stream>>>(input, output, n);
     GPU_LAB_CUDA_CHECK(cudaGetLastError());
 }
 
 }  // namespace gpu_lab::cuda
-

@@ -18,16 +18,26 @@ def render(payload: dict, environment: dict) -> str:
         f"- Timing protocol: {payload['protocol']['timer']}",
         "- CUDA defaults: 20 warm-up launches and 100 measured launches when a CUDA binary is available.",
         "- CPU fallback: adaptive warm-up and iteration counts are recorded in the JSON protocol.",
+        f"- Speedup rule: {payload['protocol']['speedup_rule']}",
         "",
-        "| Family | Variant | Shape | Median ms | Mean ms | Min ms | Std ms | Speedup | Status |",
-        "|---|---|---:|---:|---:|---:|---:|---:|---|",
+        "| Family | Variant | Shape | Backend | Device | Median ms | Mean ms | Min ms | Std ms | Baseline | Speedup | Status |",
+        "|---|---|---|---|---|---:|---:|---:|---:|---|---:|---|",
     ]
     for item in payload["benchmarks"]:
         speedup = "—" if item.get("speedup") is None else f"{item['speedup']:.3f}x"
+        baseline = item.get("baseline_variant") or "—"
+        if "median_ms" in item:
+            median = f"{item['median_ms']:.6f}"
+            mean = f"{item['mean_ms']:.6f}"
+            minimum = f"{item['min_ms']:.6f}"
+            std = f"{item['std_ms']:.6f}"
+        else:
+            median = mean = minimum = std = "—"
         lines.append(
             f"| {item['family']} | {item['variant']} | `{item['shape']}` | "
-            f"{item['median_ms']:.6f} | {item['mean_ms']:.6f} | {item['min_ms']:.6f} | "
-            f"{item['std_ms']:.6f} | {speedup} | {item['status']} |"
+            f"{item.get('backend', 'unknown')} | {item.get('device', 'unknown')} | "
+            f"{median} | {mean} | {minimum} | {std} | {baseline} | {speedup} | "
+            f"{item['status']} |"
         )
     lines.extend([
         "",
@@ -59,4 +69,3 @@ def main() -> None:
 
 if __name__ == "__main__":
     main()
-
