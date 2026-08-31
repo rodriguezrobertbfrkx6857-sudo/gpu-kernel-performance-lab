@@ -1,20 +1,20 @@
-# gpu-kernel-performance-lab
+# GPU Kernel Performance Lab：CUDA 内核性能工程实验
 
-CUDA performance engineering experiments covering memory access, reductions, warp-level operations and tiled GEMM.
+一套以测量为中心的 CUDA 性能工程实验，覆盖内存访问、矩阵转置、归约、Warp 级操作和分块 GEMM。仓库同时保留 CPU 参考路径，因此没有 NVIDIA 硬件时也能运行正确性测试、生成结构化报告，并为后续上机复现实验保留完整 CUDA 源码。
 
-The repository is intentionally small and measurement-first. It contains CUDA kernels and correctness tests for vector addition, matrix transpose, reduction, and GEMM, plus a CPU reference path that keeps the project runnable on hosts without NVIDIA hardware. The current checked-in report was generated on this host in `cpu_only` mode; it contains no GPU timing claims.
+当前提交的报告是在本机 `cpu_only` 模式生成的真实结果，不包含 GPU 时间或 GPU 加速结论。CUDA 数据必须在安装 NVIDIA 驱动和 CUDA Toolkit 的机器上重新测量。
 
-## Project overview
+## 实验内容
 
-- Vector add: device allocation, launch geometry, and bandwidth accounting.
-- Transpose: copy baseline, naive global-memory transpose, `tile[32][32]`, and padded `tile[32][33]` shared-memory variants.
-- Reduction: interleaved atomic baseline, shared-memory reduction, and warp-shuffle reduction using `__shfl_down_sync`.
-- GEMM: naive and shared-memory tiled kernels, with an optional cuBLAS comparison in the CUDA benchmark.
-- Benchmark protocol: correctness, warm-up, repeated timing, synchronization, summary statistics, and generated JSON/Markdown output.
+- 向量加法：设备分配、启动配置和带宽核算。
+- 转置：复制基线、朴素全局内存、`tile[32][32]` 以及规避 bank conflict 的 `tile[32][33]` 共享内存版本。
+- 归约：交错原子累加、共享内存归约和使用 `__shfl_down_sync` 的 Warp shuffle 归约。
+- GEMM：朴素版本、共享内存分块版本，以及 CUDA 构建可用时的 cuBLAS 对照。
+- 基准协议：正确性、预热、重复计时、同步、统计摘要和 JSON/Markdown 报告。
 
-## Quick start
+## 快速开始
 
-The Python fallback uses the Miniconda interpreter or any Python installation with NumPy:
+CPU 参考路径只需要 Python 和 NumPy：
 
 ```powershell
 python scripts/run_tests.py
@@ -22,11 +22,11 @@ python scripts/run_all_benchmarks.py
 python scripts/generate_report.py
 ```
 
-The benchmark runner records `median_ms`, `mean_ms`, `min_ms`, `std_ms`, dtype, device, backend, warm-up count, measured iteration count, and an explicitly declared baseline-relative speedup where a comparison exists. Transpose optimization speedups use `transpose_naive`; `copy_baseline` is reported as a bandwidth reference only. CUDA binaries use CUDA Events with 20 warm-up launches and 100 measured launches by default. CPU fallback measurements use adaptive counts recorded in the JSON protocol.
+基准记录 `median_ms`、`mean_ms`、`min_ms`、`std_ms`、数据类型、设备、后端、预热次数、测量次数和有明确基线的相对加速比。CPU 计时使用自适应次数，并把实际次数写入 JSON。
 
-## CUDA build
+## CUDA 构建
 
-On a CUDA-capable machine with CMake and a C++ compiler:
+在具备 CMake、C++ 编译器和 CUDA Toolkit 的机器上：
 
 ```powershell
 cmake -S . -B build -DCMAKE_BUILD_TYPE=Release
@@ -34,30 +34,21 @@ cmake --build build --config Release --parallel
 ctest --test-dir build -C Release --output-on-failure
 ```
 
-The CMake file detects CUDA. With no CUDA compiler it builds and registers `cpu_smoke_tests` only and leaves the `.cu` sources available for inspection or a later CUDA build. On CUDA hardware, all four CUDA correctness executables are registered with CTest before the benchmark executables. Set `-DGPU_LAB_CUDA_ARCHITECTURES=all` or a specific architecture when the toolchain requires an explicit target; the default leaves the choice to CMake/toolchain configuration.
+CMake 会自动检测 CUDA。没有 CUDA 编译器时，只构建并注册 `cpu_smoke_tests`，`.cu` 源码仍可检查并等待后续上机。需要显式指定架构时，可使用 `-DGPU_LAB_CUDA_ARCHITECTURES=all` 或具体架构。
 
-## Benchmark methodology
+## 测量口径
 
-CUDA timing is bracketed by CUDA Events and synchronized at the stop event. Every CUDA test uses non-square or non-multiple-of-32 shapes where useful to exercise bounds checks. Transpose reports effective bandwidth as bytes read plus bytes written divided by median time. GEMM is compared against cuBLAS when the CUDA build links the toolkit library; the project does not assume a custom kernel should beat a vendor library. Large benchmark cases perform a free-memory check and emit a structured skip record when safety headroom is unavailable.
+CUDA 使用 CUDA Events 计时，并在停止事件处同步；正确性始终先于预热和性能测量。转置报告读写总字节数除以中位时间得到的有效带宽，GEMM 在可用时与 cuBLAS 对比，不预设自定义内核必须超过厂商库。大规模用例会检查剩余显存，并在安全余量不足时写入结构化跳过记录。
 
-For a focused profiler launch, use the GEMM benchmark selector, for example `build/Release/bench_gemm.exe --profile-case gemm_tiled-512` on a Windows multi-config build. The selector runs one kernel/shape so an Nsight command can be reproduced without profiling unrelated cases.
+当前机器的结果见 [`results/results.md`](results/results.md)，机器可读数据见 [`results/benchmark_results.json`](results/benchmark_results.json)。由于本机没有 NVIDIA 驱动和 CUDA Toolkit，报告状态为 `NOT BENCHMARKED ON CURRENT HARDWARE`，记录行是 CPU 参考结果。
 
-The generated report for the current machine is [results/results.md](results/results.md), with machine-readable data in [results/benchmark_results.json](results/benchmark_results.json). Because this host has no NVIDIA driver or CUDA Toolkit, CUDA status is `NOT BENCHMARKED ON CURRENT HARDWARE` and the recorded rows are CPU references.
+## 文档与复现
 
-## Key concepts
+- [`docs/execution_model.md`](docs/execution_model.md)：Grid、Block、Thread、Warp 和 SIMT 执行模型。
+- [`docs/memory_optimization.md`](docs/memory_optimization.md)：全局内存合并访问、共享内存和 bank conflict 填充。
+- [`docs/profiling_case_study.md`](docs/profiling_case_study.md)：没有 Nsight 时的分析边界。
 
-Grid, block, thread, warp, and SIMT execution are introduced in [docs/execution_model.md](docs/execution_model.md). Global-memory coalescing, shared memory, and bank-conflict padding are discussed in [docs/memory_optimization.md](docs/memory_optimization.md). The profiling note records what can and cannot be measured when Nsight is absent in the current environment: [docs/profiling_case_study.md](docs/profiling_case_study.md).
-
-## Limitations
-
-- No NVIDIA GPU, NVIDIA driver, CUDA Toolkit, or Nsight tool was present during the current run.
-- The CPU fallback validates algorithmic behavior and benchmark plumbing; it is not a substitute for GPU throughput data.
-- The reduction baseline intentionally demonstrates a simple atomic accumulation and is not presented as production code.
-- Register tiling and tensor-core paths are outside the maintained scope until a correctness-tested workload justifies them.
-
-## Reproducibility
-
-The environment snapshot is generated by [scripts/detect_environment.py](scripts/detect_environment.py). Seeds and shapes are explicit in the benchmark scripts. Regenerate the report after every hardware or compiler change:
+环境快照由 [`scripts/detect_environment.py`](scripts/detect_environment.py) 生成。每次硬件或编译器变化后重新执行：
 
 ```powershell
 python scripts/detect_environment.py --output-dir results
@@ -65,4 +56,9 @@ python scripts/run_all_benchmarks.py
 python scripts/generate_report.py
 ```
 
-GPU benchmarks must be reproduced on CUDA-capable hardware. See the generated environment files for the exact state captured for this checkout.
+## 限制
+
+- 当前已记录环境没有 NVIDIA GPU、驱动、CUDA Toolkit 或 Nsight。
+- CPU 路径用于验证算法行为和基准流程，不能替代 GPU 吞吐数据。
+- 归约基线是用于教学和对照的简单原子累加，不作为生产实现推荐。
+- 寄存器分块和 Tensor Core 路径不在当前维护范围内，除非有通过正确性测试的实际工作负载支持。
