@@ -4,6 +4,10 @@
 
 当前提交的报告是在本机 `cpu_only` 模式生成的真实结果，不包含 GPU 时间或 GPU 加速结论。CUDA 数据必须在安装 NVIDIA 驱动和 CUDA Toolkit 的机器上重新测量。
 
+[![CI](https://github.com/rodriguezrobertbfrkx6857-sudo/gpu-kernel-performance-lab/actions/workflows/ci.yml/badge.svg)](https://github.com/rodriguezrobertbfrkx6857-sudo/gpu-kernel-performance-lab/actions/workflows/ci.yml)
+
+> 评委速览：这是作品集的 CUDA 基础旗舰项目，重点展示 coalescing、shared memory、bank-conflict padding、warp shuffle 和 tiled GEMM。当前仓库提供 CPU 参考证据与完整 CUDA 源码；GPU 结果需在 CUDA 主机上按复现命令重新生成。
+
 ## 实验内容
 
 - 向量加法：设备分配、启动配置和带宽核算。
